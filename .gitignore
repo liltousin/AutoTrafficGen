@@ -1,0 +1,6 @@
+.venv
+__pychache__
+.env
+cookies*
+log.log
+proxies.json

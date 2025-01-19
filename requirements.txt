@@ -1,0 +1,6 @@
+selenium
+undetected-chromedriver
+psycopg2-binary
+python-telegram-bot
+setuptools
+fake_useragent

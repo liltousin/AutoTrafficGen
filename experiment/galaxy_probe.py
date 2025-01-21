@@ -4,12 +4,15 @@ import urllib.parse
 
 import undetected_chromedriver as uc
 from fake_useragent import UserAgent
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 LOCALSTORAGE_FILE = "localstorage.json"
 URL = "https://galaxy.mobstudio.ru/web/"  # Updated Galaxy URL
 COOKIES_FILE = "cookies.json"
 LOG_FILE = "log.log"
-PROXY = "socks4://54.36.13.94:11668"  # Replace with your proxy if needed
+PROXY = "socks4://139.162.136.140:1080"  # Replace with your proxy if needed
 
 
 # Configure Selenium options
@@ -122,6 +125,14 @@ def main():
 
         previous_cookies = driver.get_cookies()
         previous_localstorage = driver.execute_script("return window.localStorage;")
+
+        # wait 3.5 seconds on the web page before trying anything
+        time.sleep(3.5)
+
+        # Wait for 3 seconds until finding the element
+        wait = WebDriverWait(driver, 10)
+        element = wait.until(EC.presence_of_element_located((By.XPATH, '//*[text()="Создать персонаж"]')))
+        print("Product name: " + element.text)
 
         while True:
             time.sleep(1)  # Keep the browser open for manual inspection

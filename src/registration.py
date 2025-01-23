@@ -1,3 +1,7 @@
+import os
+import platform
+import shutil
+import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor
 
@@ -10,6 +14,9 @@ from state_machine import StateMachine
 # Global configuration
 URL = "https://galaxy.mobstudio.ru/web/"  # Updated Galaxy URL
 NUM_THREADS = 2  # Number of threads to run
+
+# Path to the original chromedriver executable (for Windows only)
+ORIGINAL_DRIVER_PATH = os.path.expanduser("~\\AppData\\Roaming\\undetected_chromedriver\\undetected_chromedriver.exe")
 
 
 # Configure Selenium options
@@ -27,10 +34,24 @@ def configure_driver(proxy):
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-
     options.add_argument(f"--proxy-server={proxy}")
 
-    return Chrome(options=options)
+    if platform.system() == "Windows":
+        # Create a unique temporary directory for each process (Windows only)
+        temp_dir = tempfile.mkdtemp()
+        driver_path = os.path.join(temp_dir, "chromedriver.exe")
+
+        # Copy the original driver to the temporary directory
+        if os.path.exists(ORIGINAL_DRIVER_PATH):
+            shutil.copy(ORIGINAL_DRIVER_PATH, driver_path)
+        else:
+            raise FileNotFoundError(f"Original chromedriver not found at {ORIGINAL_DRIVER_PATH}")
+
+        # Use the unique driver path
+        return Chrome(options=options, driver_executable_path=driver_path)
+    else:
+        # Use default behavior for non-Windows systems
+        return Chrome(options=options)
 
 
 # Function to fetch the best proxies without duplicate real_ip

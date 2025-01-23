@@ -1,27 +1,28 @@
-import logging
 import random
 import time
 
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
 from selenium.webdriver.common.by import By
 
-logging.basicConfig(level=logging.INFO)
-
 
 class StateMachine:
-    def __init__(self, driver, url):
+    def __init__(self, driver, url, proxy):
         self.driver = driver
         self.url = url
+        self.proxy = proxy
 
     def run(self):
-        logging.info("Starting StateMachine...")
+        print(f"Starting StateMachine with proxy: {self.proxy}")
 
         state_func = self.open_site_state
 
         while state_func:
             state_func = state_func()
 
-        logging.info("StateMachine finished.")
+        print("StateMachine finished.")
+
+        # Wait for user input to continue
+        input("Press Enter to continue...")
 
     def random_delay(self, min_sec=1.0, max_sec=2.0):
         time.sleep(random.uniform(min_sec, max_sec))
@@ -58,12 +59,12 @@ class StateMachine:
             with open("page_source.html", "w", encoding="utf-8") as f:
                 f.write(self.driver.page_source)
             self.driver.save_screenshot("screenshot.png")
-            logging.info("Page source and screenshot saved for analysis.")
+            print("Page source and screenshot saved for analysis.")
         except Exception as e:
-            logging.error(f"Error logging page details: {e}")
+            print(f"Error logging page details: {e}")
 
     def open_site_state(self):
-        logging.info("State: open_site_state")
+        print("State: open_site_state")
         try:
             self.driver.get(self.url)
             while True:
@@ -72,59 +73,90 @@ class StateMachine:
                     break
                 time.sleep(0.5)
 
-            logging.info("Site loaded, proceeding to click_create_character_state")
+            print("Site loaded, proceeding to click_create_character_state")
+            self.random_delay(2, 4)  # Random delay before moving to the next state
             return self.click_create_character_state
 
         except WebDriverException as e:
-            logging.error(f"Error opening site: {e}, retrying open_site_state")
+            print(f"Error opening site: {e}, retrying open_site_state")
             return self.open_site_state
 
     def click_create_character_state(self):
-        logging.info("State: click_create_character_state")
+        print("State: click_create_character_state")
         try:
             button, iframe = self.wait_for_element(By.XPATH, '//*[text()="Создать персонаж"]', timeout=30)
             if button:
                 if iframe:
                     self.driver.switch_to.frame(iframe)
-                    logging.info("Switched to iframe context.")
+                    print("Switched to iframe context.")
 
                 self.human_reaction_delay()
                 button.click()
-                logging.info("Clicked 'Создать персонаж', proceeding to click_gender_state")
+                print("Clicked 'Создать персонаж', proceeding to click_gender_state")
 
                 self.driver.switch_to.default_content()  # Return to main context if switched
+                self.random_delay(2, 4)  # Random delay before moving to the next state
                 return self.click_gender_state
             else:
-                logging.warning("Button 'Создать персонаж' not found, logging details.")
+                print("Button 'Создать персонаж' not found, logging details.")
                 self.log_page_details()
                 return self.click_create_character_state
 
         except WebDriverException as e:
-            logging.error(f"Error in click_create_character_state: {e}, logging details and retrying.")
+            print(f"Error in click_create_character_state: {e}, logging details and retrying.")
             self.log_page_details()
             return self.click_create_character_state
 
     def click_gender_state(self):
-        logging.info("State: click_gender_state")
+        print("State: click_gender_state")
         try:
             gender_button, iframe = self.wait_for_element(By.XPATH, '//*[text()="Женский"]', timeout=30)
             if gender_button:
                 if iframe:
                     self.driver.switch_to.frame(iframe)
-                    logging.info("Switched to iframe context.")
+                    print("Switched to iframe context.")
 
                 self.human_reaction_delay()
                 gender_button.click()
-                logging.info("Clicked 'Женский', finishing process.")
+                print("Clicked 'Женский', proceeding to click_next_state.")
 
                 self.driver.switch_to.default_content()  # Return to main context if switched
-                return None
+
+                self.random_delay(2, 4)  # Random delay before moving to the next state
+                return self.click_next_state
             else:
-                logging.warning("Gender button 'Женский' not found, logging details.")
+                print("Gender button 'Женский' not found, logging details.")
                 self.log_page_details()
                 return self.click_gender_state
 
         except WebDriverException as e:
-            logging.error(f"Error in click_gender_state: {e}, logging details and retrying.")
+            print(f"Error in click_gender_state: {e}, logging details and retrying.")
             self.log_page_details()
             return self.click_gender_state
+
+    def click_next_state(self):
+        print("State: click_next_state")
+        try:
+            next_button, iframe = self.wait_for_element(By.XPATH, '//*[text()="Далее"]', timeout=30)
+            if next_button:
+                if iframe:
+                    self.driver.switch_to.frame(iframe)
+                    print("Switched to iframe context.")
+
+                self.human_reaction_delay()
+                next_button.click()
+                print("Clicked 'Далее', finishing process.")
+
+                self.driver.switch_to.default_content()  # Return to main context if switched
+
+                self.random_delay(2, 4)  # Random delay before finishing
+                return None
+            else:
+                print("Button 'Далее' not found, logging details.")
+                self.log_page_details()
+                return self.click_next_state
+
+        except WebDriverException as e:
+            print(f"Error in click_next_state: {e}, logging details and retrying.")
+            self.log_page_details()
+            return self.click_next_state

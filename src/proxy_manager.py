@@ -165,7 +165,7 @@ def process_proxies_concurrently():
                 for proxy in proxies
             ]
 
-            with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
                 executor.map(lambda proxy: update_proxy_score(proxy, conn), proxies_list)
 
             fetch_proxies(conn)

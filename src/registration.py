@@ -13,7 +13,7 @@ from state_machine import StateMachine
 
 # Global configuration
 URL = "https://galaxy.mobstudio.ru/web/"  # Updated Galaxy URL
-NUM_THREADS = 2  # Number of threads to run
+NUM_THREADS = 1  # Number of threads to run
 
 # Path to the original chromedriver executable (for Windows only)
 ORIGINAL_DRIVER_PATH = os.path.expanduser("~\\AppData\\Roaming\\undetected_chromedriver\\undetected_chromedriver.exe")
@@ -89,7 +89,7 @@ def worker(proxy):
     driver = None
     try:
         driver = configure_driver(proxy)
-        state_machine = StateMachine(driver, URL)
+        state_machine = StateMachine(driver, URL, proxy)
         state_machine.run()
         print(f"State machine completed successfully for proxy {proxy}")
 

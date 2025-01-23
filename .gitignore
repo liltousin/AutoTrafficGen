@@ -4,3 +4,5 @@ venv/*
 cookies*
 log.log
 proxies.json
+page_source.html
+screenshot.png

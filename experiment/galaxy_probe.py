@@ -12,7 +12,7 @@ LOCALSTORAGE_FILE = "localstorage.json"
 URL = "https://galaxy.mobstudio.ru/web/"  # Updated Galaxy URL
 COOKIES_FILE = "cookies.json"
 LOG_FILE = "log.log"
-PROXY = "socks4://139.162.136.140:1080"  # Replace with your proxy if needed
+PROXY = "socks4://45.12.132.30:49591"  # Replace with your proxy if needed
 
 
 # Configure Selenium options
@@ -130,9 +130,8 @@ def main():
         time.sleep(3.5)
 
         # Wait for 3 seconds until finding the element
-        wait = WebDriverWait(driver, 10)
-        element = wait.until(EC.presence_of_element_located((By.XPATH, '//*[text()="Создать персонаж"]')))
-        print("Product name: " + element.text)
+        wait = WebDriverWait(driver, 16)
+        wait.until(EC.presence_of_element_located((By.XPATH, '//*[text()="Создать персонаж"]'))).click()
 
         while True:
             time.sleep(1)  # Keep the browser open for manual inspection

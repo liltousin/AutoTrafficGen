@@ -4,7 +4,7 @@ import psycopg2
 DB_CONFIG = {
     "dbname": "autotraficgen",
     "user": "postgres",
-    "password": "postgres",
+    "password": "",
     "host": "localhost",
     "port": 5432,
 }

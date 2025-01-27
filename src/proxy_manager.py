@@ -3,8 +3,11 @@ import os
 import random
 
 import requests
+from dotenv import load_dotenv
 
 from database import connect_to_db
+
+load_dotenv()
 
 # Proxy settings
 PROXY_API_KEY = os.getenv("PROXY_API_KEY")
@@ -165,7 +168,7 @@ def process_proxies_concurrently():
                 for proxy in proxies
             ]
 
-            with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
                 executor.map(lambda proxy: update_proxy_score(proxy, conn), proxies_list)
 
             fetch_proxies(conn)

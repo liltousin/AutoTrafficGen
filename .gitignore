@@ -6,3 +6,4 @@ log.log
 proxies.json
 page_source.html
 screenshot.png
+.DS_Store
